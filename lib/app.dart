@@ -53,7 +53,9 @@ class _TaskMangerAppState extends State<TaskMangerApp> {
 
   OutlineInputBorder _inputBorder() {
     return OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.grey),
+      borderSide: BorderSide(
+        color: Colors.grey.withOpacity(0.5),
+      ),
       borderRadius: BorderRadius.circular(8),
     );
   }
