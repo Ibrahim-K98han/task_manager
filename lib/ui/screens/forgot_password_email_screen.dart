@@ -1,18 +1,20 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/ui/screens/forgot_password_otp_screen.dart';
 import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import 'package:task_manager/utils/app_colors.dart';
 
 import '../../widgets/screen_background.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class ForgotPasswordEmailScreen extends StatefulWidget {
+  const ForgotPasswordEmailScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<ForgotPasswordEmailScreen> createState() =>
+      _ForgotPasswordEmailScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
@@ -26,13 +28,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 SizedBox(height: 82),
                 Text(
-                  'Join With Us',
+                  'Your Email Address',
                   style: textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+                SizedBox(height: 8),
+                Text(
+                  'A 6 digits Verification OTP will be sent to your email address',
+                  style: textTheme.titleSmall?.copyWith(
+                    color: Colors.grey,
+                  ),
+                ),
                 SizedBox(height: 24),
-                _buildSignUpForm(),
+                _buildForgotPasswordForm(),
                 SizedBox(height: 36),
                 Center(
                   child: _buildHaveAccountSection(),
@@ -68,7 +77,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildSignUpForm() {
+  Widget _buildForgotPasswordForm() {
     return Column(
       children: [
         TextFormField(
@@ -80,49 +89,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
         ),
-        SizedBox(height: 16),
-        TextFormField(
-          decoration: InputDecoration(
-            hintText: 'First Name',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        SizedBox(height: 16),
-        TextFormField(
-          decoration: InputDecoration(
-            hintText: 'Last Name',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        SizedBox(height: 16),
-        TextFormField(
-          keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-            hintText: 'Mobile',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        SizedBox(height: 16),
-        TextFormField(
-          obscureText: true,
-          decoration: InputDecoration(
-            hintText: 'Password',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-        ),
         SizedBox(height: 36),
         ElevatedButton(
-          onPressed: _onTapSignUpButton,
+          onPressed: _onTapNextButton,
           child: Text(
-            'Sign Up',
+            'Next',
             style: TextStyle(
               fontSize: 18,
             ),
@@ -132,7 +103,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  void _onTapSignUpButton() {}
+  void _onTapNextButton() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ForgotPasswordOtpScreen(),
+      ),
+    );
+  }
+
   void _onTapLoginUp() {
     Navigator.push(
       context,

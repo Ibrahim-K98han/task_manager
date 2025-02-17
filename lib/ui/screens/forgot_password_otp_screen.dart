@@ -1,18 +1,21 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager/ui/screens/reset_password_screen.dart';
 import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import 'package:task_manager/utils/app_colors.dart';
 
 import '../../widgets/screen_background.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class ForgotPasswordOtpScreen extends StatefulWidget {
+  const ForgotPasswordOtpScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<ForgotPasswordOtpScreen> createState() =>
+      _ForgotPasswordOtpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
@@ -26,13 +29,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 SizedBox(height: 82),
                 Text(
-                  'Join With Us',
+                  'PIN Verification',
                   style: textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+                SizedBox(height: 8),
+                Text(
+                  'A 6 digits Verification OTP will be sent to your email address',
+                  style: textTheme.titleSmall?.copyWith(
+                    color: Colors.grey,
+                  ),
+                ),
                 SizedBox(height: 24),
-                _buildSignUpForm(),
+                _buildForgotPasswordForm(),
                 SizedBox(height: 36),
                 Center(
                   child: _buildHaveAccountSection(),
@@ -68,61 +78,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildSignUpForm() {
+  Widget _buildForgotPasswordForm() {
     return Column(
       children: [
-        TextFormField(
-          keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            hintText: 'Email',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
+        PinCodeTextField(
+          appContext: context,
+          length: 6,
+          obscureText: false,
+          animationType: AnimationType.fade,
+          keyboardType: TextInputType.number,
+          pinTheme: PinTheme(
+            shape: PinCodeFieldShape.box,
+            borderRadius: BorderRadius.circular(5),
+            fieldHeight: 50,
+            fieldWidth: 40,
+            activeFillColor: Colors.white,
+            inactiveFillColor: Colors.white,
+            selectedFillColor: Colors.white,
           ),
-        ),
-        SizedBox(height: 16),
-        TextFormField(
-          decoration: InputDecoration(
-            hintText: 'First Name',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        SizedBox(height: 16),
-        TextFormField(
-          decoration: InputDecoration(
-            hintText: 'Last Name',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        SizedBox(height: 16),
-        TextFormField(
-          keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-            hintText: 'Mobile',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-        ),
-        SizedBox(height: 16),
-        TextFormField(
-          obscureText: true,
-          decoration: InputDecoration(
-            hintText: 'Password',
-            hintStyle: TextStyle(
-              color: Colors.grey,
-            ),
-          ),
+          animationDuration: Duration(milliseconds: 300),
+          backgroundColor: Colors.transparent,
+          enableActiveFill: true,
         ),
         SizedBox(height: 36),
         ElevatedButton(
-          onPressed: _onTapSignUpButton,
+          onPressed: _onTapVerifyButton,
           child: Text(
-            'Sign Up',
+            'Verify',
             style: TextStyle(
               fontSize: 18,
             ),
@@ -132,13 +114,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  void _onTapSignUpButton() {}
-  void _onTapLoginUp() {
+  void _onTapVerifyButton() {
     Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResetPasswordScreen(),
+      ),
+    );
+  }
+
+  void _onTapLoginUp() {
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) => SignInScreen(),
       ),
+      (_) => false,
     );
   }
 }
