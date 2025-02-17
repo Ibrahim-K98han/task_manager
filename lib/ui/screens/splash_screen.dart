@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/ui/controllers/auth_controller.dart';
-import 'package:task_manager/ui/screens/main_bottom_nav_bar_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_manager/ui/screens/sign_in_screen.dart';
-import '../widgets/screen_background.dart';
+import 'package:task_manager/utils/assets_path.dart';
+import 'package:task_manager/widgets/screen_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,30 +12,20 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  Future<void> _moveToNextScreen() async {
-    await Future.delayed(const Duration(seconds: 2));
-    await AuthController.getAccessToken();
-    if (AuthController.isLoggedIn()) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainBottomNavBarScreen(),
-        ),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const SignInScreen(),
-        ),
-      );
-    }
-  }
-
   @override
   void initState() {
-    _moveToNextScreen();
     super.initState();
+    _moveToNextScreen();
+  }
+
+  Future<void> _moveToNextScreen() async {
+    await Future.delayed(Duration(seconds: 2));
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SignInScreen(),
+      ),
+    );
   }
 
   @override
@@ -46,13 +36,9 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Task Manager'.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 32,
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
+              SvgPicture.asset(
+                AssetsPath.logoSvg,
+                width: 140,
               ),
             ],
           ),
