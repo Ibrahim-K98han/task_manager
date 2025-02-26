@@ -19,68 +19,78 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
   final TextEditingController _descriptionTEController =
       TextEditingController();
   bool _inProgress = false;
+  bool _shouldRefreshPreviousPage = false;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: TMAppBar(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 32),
-                Text(
-                  'Add New Task',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          return;
+        }
+        Navigator.pop(context, _shouldRefreshPreviousPage);
+      },
+      child: Scaffold(
+        appBar: TMAppBar(),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 32),
+                  Text(
+                    'Add New Task',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _titleTEController,
+                    decoration: InputDecoration(
+                      hintText: 'Title',
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
                       ),
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  controller: _titleTEController,
-                  decoration: InputDecoration(
-                    hintText: 'Title',
-                    hintStyle: TextStyle(
-                      color: Colors.grey,
                     ),
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter a title';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Enter a title';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 8),
-                TextFormField(
-                  maxLines: 5,
-                  controller: _descriptionTEController,
-                  decoration: InputDecoration(
-                    hintText: 'Description',
-                    hintStyle: TextStyle(
-                      color: Colors.grey,
+                  SizedBox(height: 8),
+                  TextFormField(
+                    maxLines: 5,
+                    controller: _descriptionTEController,
+                    decoration: InputDecoration(
+                      hintText: 'Description',
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                      ),
                     ),
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter a description';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Enter a description';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 32),
-                Visibility(
-                  visible: !_inProgress,
-                  replacement: CenterCircularProgress(),
-                  child: ElevatedButton(
-                    onPressed: _onTapSubmitButton,
-                    child: Text('Add Task'),
-                  ),
-                )
-              ],
+                  SizedBox(height: 32),
+                  Visibility(
+                    visible: !_inProgress,
+                    replacement: CenterCircularProgress(),
+                    child: ElevatedButton(
+                      onPressed: _onTapSubmitButton,
+                      child: Text('Add Task'),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -109,6 +119,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     _inProgress = false;
     setState(() {});
     if (response.isSuccess) {
+      _shouldRefreshPreviousPage = true;
       _clearTextField();
       showSnackBarMessage(context, 'Task Added Success');
     } else {

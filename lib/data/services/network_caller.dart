@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:task_manager/app.dart';
@@ -11,8 +10,11 @@ class NetworkCaller {
   static Future<NetworkResponse> getRequest({required String url}) async {
     try {
       Uri uri = Uri.parse(url);
+      Map<String, String> headers = {
+        'token': AuthController.accessToken.toString(),
+      };
       debugPrint(url);
-      final Response response = await get(uri);
+      final Response response = await get(uri, headers: headers);
       printResponse(url, response);
       if (response.statusCode == 200) {
         final decodedData = jsonDecode(response.body);
