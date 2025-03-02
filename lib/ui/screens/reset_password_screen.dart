@@ -129,4 +129,3 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 }
 
-///===================== Module 15 3) Ui Design ============= ///
