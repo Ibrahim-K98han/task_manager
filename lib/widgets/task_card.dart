@@ -3,6 +3,7 @@ import 'package:task_manager/data/models/network_response.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/services/network_caller.dart';
 import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/widgets/center_circular_progress.dart';
 import 'package:task_manager/widgets/snack_bar_message.dart';
 
 class TaskCard extends StatefulWidget {
@@ -22,6 +23,7 @@ class TaskCard extends StatefulWidget {
 class _TaskCardState extends State<TaskCard> {
   String _selectedStatus = '';
   bool _changeStatusInProgress = false;
+  bool _deleteTaskInProgress = false;
   @override
   void initState() {
     _selectedStatus = widget.taskModel.status!;
@@ -51,13 +53,21 @@ class _TaskCardState extends State<TaskCard> {
                 _buildTaskStatusChip(),
                 Wrap(
                   children: [
-                    IconButton(
-                      onPressed: _onTapEditButton,
-                      icon: Icon(Icons.edit),
+                    Visibility(
+                      visible: _changeStatusInProgress == false,
+                      replacement: CenterCircularProgress(),
+                      child: IconButton(
+                        onPressed: _onTapEditButton,
+                        icon: Icon(Icons.edit),
+                      ),
                     ),
-                    IconButton(
-                      onPressed: _onDeleteButton,
-                      icon: Icon(Icons.delete),
+                    Visibility(
+                      visible: _deleteTaskInProgress == false,
+                      replacement: CenterCircularProgress(),
+                      child: IconButton(
+                        onPressed: _onDeleteButton,
+                        icon: Icon(Icons.delete),
+                      ),
                     ),
                   ],
                 )
@@ -103,11 +113,24 @@ class _TaskCardState extends State<TaskCard> {
     );
   }
 
-  void _onDeleteButton() {}
+  Future<void> _onDeleteButton() async {
+    _deleteTaskInProgress = true;
+    setState(() {});
+    final NetworkResponse response = await NetworkCaller.getRequest(
+      url: Urls.deleteTask(widget.taskModel.sId!),
+    );
+    if (response.isSuccess) {
+      widget.onRefreshList();
+    } else {
+      _deleteTaskInProgress = false;
+      setState(() {});
+      showSnackBarMessage(context, response.errorMessage);
+    }
+  }
 
   Widget _buildTaskStatusChip() {
     return Chip(
-      label: Text('New'),
+      label: Text(widget.taskModel.status!),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
