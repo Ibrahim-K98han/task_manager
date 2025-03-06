@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:task_manager/ui/controllers/auth_controller.dart';
 import 'package:task_manager/widgets/tm_app_bar.dart';
 
@@ -14,7 +17,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _firstNameTEController = TextEditingController();
   final TextEditingController _lastNameTEController = TextEditingController();
   final TextEditingController _phoneTEController = TextEditingController();
+  final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  XFile? _selectedImage;
+  bool _updateProfileInProgress = false;
   @override
   void initState() {
     _setUserData();
@@ -22,10 +28,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _setUserData() {
-    _emailTEController.text = AuthController.userData!.email ?? '';
-    _firstNameTEController.text = AuthController.userData!.firstName ?? '';
-    _lastNameTEController.text = AuthController.userData!.lastName ?? '';
-    _phoneTEController.text = AuthController.userData!.mobile ?? '';
+    _emailTEController.text = AuthController.userData?.email ?? '';
+    _firstNameTEController.text = AuthController.userData?.firstName ?? '';
+    _lastNameTEController.text = AuthController.userData?.lastName ?? '';
+    _phoneTEController.text = AuthController.userData?.mobile ?? '';
   }
 
   @override
@@ -88,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.grey,
                     ),
                   ),
-                   validator: (value) {
+                  validator: (value) {
                     if (value?.isEmpty ?? true) {
                       return 'Enter Last Name';
                     }
@@ -105,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.grey,
                     ),
                   ),
-                   validator: (value) {
+                  validator: (value) {
                     if (value?.isEmpty ?? true) {
                       return 'Enter Phone Number';
                     }
@@ -124,9 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: () {
-                    if(_formKey.currentState!.validate()){
-                      
-                    }
+                    if (_formKey.currentState!.validate()) {}
                   },
                   child: Text('Update'),
                 ),
@@ -139,39 +143,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> _updateProfile() async {
+    _updateProfileInProgress = true;
+    setState(() {});
+    Map<String, dynamic> requestBody = {
+      "email": _emailTEController.text.trim(),
+      "firstName": _firstNameTEController.text.trim(),
+      "lastName": _lastNameTEController.text.trim(),
+      "mobile": _phoneTEController.text.trim(),
+    };
+    if (_passwordTEController.text.isNotEmpty) {
+      requestBody['password'] = _passwordTEController.text;
+    }
+    if (_selectedImage != null) {
+      List<int> imageBytes = await _selectedImage!.readAsBytes();
+      String convertedImage = base64Encode(imageBytes);
+      requestBody['photo'] = convertedImage;
+    }
+  }
+
   Widget _buildPhotoPicker() {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.white,
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 50,
-            width: 100,
-            decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                bottomLeft: Radius.circular(8),
+    return GestureDetector(
+      onTap: () {
+        _selectImage();
+      },
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+        ),
+        child: Row(
+          children: [
+            Container(
+              height: 50,
+              width: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                'Photo',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
               ),
             ),
-            alignment: Alignment.center,
-            child: Text(
-              'Photo',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          SizedBox(width: 8),
-          Text('Selected Photo'),
-        ],
+            SizedBox(width: 8),
+            Text(_getSelectedPhotoTitle()),
+          ],
+        ),
       ),
     );
+  }
+
+  String _getSelectedPhotoTitle() {
+    if (_selectedImage != null) {
+      return _selectedImage!.name;
+    }
+    return 'Select photo';
+  }
+
+  Future<void> _selectImage() async {
+    ImagePicker _imagePicker = ImagePicker();
+    XFile? pickImage = await _imagePicker.pickImage(source: ImageSource.camera);
+    if (pickImage != null) {
+      _selectedImage = pickImage;
+      setState(() {});
+    }
   }
 }
