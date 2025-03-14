@@ -2,8 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:task_manager/data/models/user_model.dart';
+import 'package:task_manager/data/services/network_caller.dart';
+import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/controllers/auth_controller.dart';
+import 'package:task_manager/widgets/center_circular_progress.dart';
+import 'package:task_manager/widgets/snack_bar_message.dart';
 import 'package:task_manager/widgets/tm_app_bar.dart';
+
+import '../../data/models/network_response.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -68,6 +75,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.grey,
                     ),
                   ),
+                  validator: (String? value) {
+                    if (value?.trim().isEmpty ?? true) {
+                      return 'Enter Your Email';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 8),
                 TextFormField(
@@ -128,11 +141,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {}
-                  },
-                  child: Text('Update'),
+                Visibility(
+                  visible: _updateProfileInProgress == false,
+                  replacement: CenterCircularProgress(),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _updateProfile();
+                      }
+                    },
+                    child: Text('Update'),
+                  ),
                 ),
                 SizedBox(height: 16),
               ],
@@ -159,6 +178,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       List<int> imageBytes = await _selectedImage!.readAsBytes();
       String convertedImage = base64Encode(imageBytes);
       requestBody['photo'] = convertedImage;
+    }
+    final NetworkResponse response = await NetworkCaller.postRequest(
+      url: Urls.updateProfile,
+      body: requestBody,
+    );
+    _updateProfileInProgress = false;
+    setState(() {});
+    if (response.isSuccess) {
+      UserModel userModel = UserModel.fromJson(requestBody);
+      AuthController.saveUserData(userModel);
+      showSnackBarMessage(context, 'Profile has been updated');
+    } else {
+      showSnackBarMessage(context, response.errorMessage);
     }
   }
 
